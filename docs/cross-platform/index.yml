@@ -6,8 +6,8 @@ metadata:
   title: Mobile development with C++ documentation
   description: Create native C++ apps for iOS, Android, and Windows devices with Visual Studio.
   ms.topic: landing-page
-  author: corob-msft
-  ms.author: corob
+  author: tylermsft
+  ms.author: twhitney
   ms.date: 05/26/2020
   ms.custom: intro-landing-hub
 
@@ -29,8 +29,6 @@ landingContent:
             url: visual-cpp-for-cross-platform-mobile-development.md
       - linkListType: tutorial
         links:
-          - text: Build an OpenGL ES application on Android and iOS
-            url: build-an-opengl-es-application-on-android-and-ios.md
           - text: Create an Android Native Activity App
             url: create-an-android-native-activity-app.md
       - linkListType: learn

@@ -66,16 +66,15 @@ Default layout alignment for globals and statics:
 
 The AArch64 architecture supports 32 integer registers:
 
-| Register | Volatile? | Role |
+| Register | Volatility | Role |
 | - | - | - |
-| x0 | Volatile | Parameter/scratch register 1, result register |
-| x1-x7 | Volatile | Parameter/scratch register 2-8 |
-| x8-x15 | Volatile | Scratch registers |
+| x0-x8 | Volatile | Parameter/Result scratch registers |
+| x9-x15 | Volatile | Scratch registers |
 | x16-x17 | Volatile | Intra-procedure-call scratch registers |
-| x18 | Non-volatile | Platform register: in kernel mode, points to KPCR for the current processor; in user mode, points to TEB |
+| x18 | N/A | Reserved platform register: in kernel mode, points to KPCR for the current processor; In user mode, points to TEB |
 | x19-x28 | Non-volatile | Scratch registers |
 | x29/fp | Non-volatile | Frame pointer |
-| x30/lr | Non-volatile | Link registers |
+| x30/lr | Both | Link Register: Callee function must preserve it for its own return, but caller's value will be lost. |
 
 Each register may be accessed as a full 64-bit value (via x0-x30) or as a 32-bit value (via w0-w30). 32-bit operations zero-extend their results up to 64 bits.
 
@@ -89,18 +88,17 @@ The frame pointer (x29) is required for compatibility with fast stack walking us
 
 The AArch64 architecture also supports 32 floating-point/SIMD registers, summarized below:
 
-| Register | Volatile? | Role |
+| Register | Volatility | Role |
 | - | - | - |
-| v0 | Volatile | Parameter/scratch register 1, result register |
-| v1-v7 | Volatile | Parameter/scratch registers 2-8 |
-| v8-v15 | Non-volatile | Scratch registers (only the low 64 bits are non-volatile) |
+| v0-v7 | Volatile | Parameter/Result scratch registers |
+| v8-v15 | Both | Low 64 bits are Non-Volatile. High 64 bits are Volatile. |
 | v16-v31 | Volatile | Scratch registers |
 
 Each register may be accessed as a full 128-bit value (via v0-v31 or q0-q31). It may be accessed as a 64-bit value (via d0-d31), as a 32-bit value (via s0-s31), as a 16-bit value (via h0-h31), or as an 8-bit value (via b0-b31). Accesses smaller than 128 bits only access the lower bits of the full 128-bit register. They leave the remaining bits untouched unless otherwise specified. (AArch64 is different from AArch32, where the smaller registers were packed on top of the larger registers.)
 
 The floating-point control register (FPCR) has certain requirements on the various bitfields within it:
 
-| Bits | Meaning | Volatile? | Role |
+| Bits | Meaning | Volatility | Role |
 | - | - | - | - |
 | 26 | AHP | Non-Volatile | Alternative half-precision control. |
 | 25 | DN | Non-Volatile | Default NaN mode control. |
@@ -204,7 +202,7 @@ A type is considered to be an HFA or HVA if all of the following hold:
 - It doesn't have any non-trivial default or copy constructors, destructors, or assignment operators,
 - All of its members have the same HFA or HVA type, or are float, double, or neon types that match the other members' HFA or HVA types.
 
-HFA and HVA values with four or fewer elements are returned in s0-s3, d0-d3, or v0-v3, as appropriate.
+HVA values with four or fewer elements are returned in s0-s3, d0-d3, or v0-v3, as appropriate.
 
 Types returned by value are handled differently depending on whether they have certain properties, and whether the function is a non-static member function. Types which have all of these properties,
 
@@ -214,9 +212,10 @@ Types returned by value are handled differently depending on whether they have c
 
 and are returned by non-member functions or static member functions, use the following return style:
 
+- Types that are HFAs with four or fewer elements are returned in s0-s3, d0-d3, or v0-v3, as appropriate.
 - Types less than or equal to 8 bytes are returned in x0.
 - Types less than or equal to 16 bytes are returned in x0 and x1, with x0 containing the lower-order 8 bytes.
-- For types greater than 16 bytes, the caller shall reserve a block of memory of sufficient size and alignment to hold the result. The address of the memory block shall be passed as an additional argument to the function in x8. The callee may modify the result memory block at any point during the execution of the subroutine. The callee isn't required to preserve the value stored in x8.
+- For other aggregate types, the caller shall reserve a block of memory of sufficient size and alignment to hold the result. The address of the memory block shall be passed as an additional argument to the function in x8. The callee may modify the result memory block at any point during the execution of the subroutine. The callee isn't required to preserve the value stored in x8.
 
 All other types use this convention:
 

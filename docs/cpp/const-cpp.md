@@ -1,7 +1,7 @@
 ---
 description: "Learn more about: const (C++)"
 title: "const (C++)"
-ms.date: 02/03/2022
+ms.date: 09/27/2022
 f1_keywords: ["const_cpp"]
 helpviewer_keywords: ["const keyword [C++]"]
 ms.assetid: b21c0271-1ad0-40a0-b21c-5e812bba0318
@@ -147,25 +147,30 @@ int main()
 
 ## C and C++ `const` differences
 
-When you declare a variable as **`const`** in a C source code file, you do so as:
+When you define a **`const`** variable in a C source code file, you do so as:
 
-```cpp
+```C
 const int i = 2;
 ```
 
 You can then use this variable in another module as follows:
 
-```cpp
+```C
 extern const int i;
 ```
 
-But to get the same behavior in C++, you must declare your **`const`** variable as:
+But to get the same behavior in C++, you must define your **`const`** variable as:
 
 ```cpp
 extern const int i = 2;
 ```
+Similar to C, you can then use this variable in another module as follows:
 
-If you wish to declare an **`extern`** variable in a C++ source code file for use in a C source code file, use:
+```cpp
+extern const int i;
+```
+
+If you wish to define an **`extern`** variable in a C++ source code file for use in a C source code file, use:
 
 ```cpp
 extern "C" const int x=10;
